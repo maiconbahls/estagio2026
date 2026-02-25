@@ -645,23 +645,59 @@ function abrirDashboardIndividual(colaborador) {
     const inicio = formatarDataBR(mapearColuna(colaborador, ['ADMISSAO', 'INICIO']));
     const termino = formatarDataBR(mapearColuna(colaborador, ['TERMINO', 'FIM', 'CONTRATO']));
 
-    // Preencher Textos
+    // Dados Complementares (Mapeamento de novas colunas)
+    const curso = mapearColuna(colaborador, ['CURSO', 'ESCOLARIDADE', 'FORMACAO']) || 'NÃO INFORMADO';
+    const bio = mapearColuna(colaborador, ['BIO', 'SOBRE', 'RESUMO', 'DESCRICAO']) || 'ESTAGIÁRIO ATIVO DO CICLO 2026. PARTICIPAÇÃO EM PROJETOS DA ÁREA.';
+    const nascimento = formatarDataBR(mapearColuna(colaborador, ['NASCIMENTO', 'DATA_NASC']));
+    const hobbies = mapearColuna(colaborador, ['HOBBIES', 'INTERESSES']) || '-';
+    const foto = mapearColuna(colaborador, ['FOTO', 'URL_FOTO', 'IMAGEM']);
+
+    // Contatos
+    const email = mapearColuna(colaborador, ['EMAIL', 'CORREIO']) || '#';
+    const whatsapp = mapearColuna(colaborador, ['WHATSAPP', 'CELULAR', 'TELEFONE']) || '';
+    const linkedin = mapearColuna(colaborador, ['LINKEDIN']) || '#';
+
+    // Preencher Textos Básicos
     document.getElementById('indiv-nome').innerText = nome;
     document.getElementById('indiv-matricula').innerText = mat;
     document.getElementById('indiv-cargo').innerText = cargo;
     document.getElementById('indiv-data-inicio').innerText = inicio;
     document.getElementById('indiv-data-termino').innerText = termino;
 
+    // Preencher Dados Complementares
+    document.getElementById('indiv-curso').innerText = curso;
+    document.getElementById('indiv-bio').innerText = bio;
+    document.getElementById('indiv-nascimento').innerText = nascimento;
+    document.getElementById('indiv-hobbies').innerText = hobbies;
+
+    // Foto
+    const imgEl = document.getElementById('indiv-foto');
+    const placeholderEl = document.getElementById('indiv-foto-placeholder');
+    if (foto && foto.startsWith('http')) {
+        imgEl.src = foto;
+        imgEl.classList.remove('hidden');
+        placeholderEl.classList.add('hidden');
+    } else {
+        imgEl.classList.add('hidden');
+        placeholderEl.classList.remove('hidden');
+    }
+
+    // Links de Contato
+    document.getElementById('indiv-email-btn').href = email.includes('@') ? `mailto:${email}` : '#';
+    document.getElementById('indiv-whatsapp-btn').href = whatsapp ? `https://wa.me/55${whatsapp.replace(/\D/g, '')}` : '#';
+    document.getElementById('indiv-linkedin-btn').href = linkedin.startsWith('http') ? linkedin : `https://linkedin.com/in/${linkedin}`;
+
     const badge = document.getElementById('indiv-status-badge');
     badge.innerText = status;
     badge.className = `px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${status === 'ATIVO' ? 'bg-brand-accent/10 text-brand-accent' : 'bg-purple-100 text-purple-600'}`;
 
     // Calcular tempo (simples)
-    if (inicio !== '-' && inicio.includes('-')) {
-        const d1 = new Date(inicio);
+    if (inicio !== '-' && (inicio.includes('/') || inicio.includes('-'))) {
+        const partes = inicio.includes('/') ? inicio.split('/') : inicio.split('-');
+        const d1 = inicio.includes('/') ? new Date(partes[2], partes[1] - 1, partes[0]) : new Date(partes[0], partes[1] - 1, partes[2]);
         const d2 = new Date();
         const meses = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
-        document.getElementById('indiv-tempo').innerText = meses + " Meses";
+        document.getElementById('indiv-tempo').innerText = Math.max(0, meses) + " Meses";
     } else {
         document.getElementById('indiv-tempo').innerText = "-";
     }
@@ -676,18 +712,23 @@ function abrirDashboardIndividual(colaborador) {
     feedLista.innerHTML = '';
 
     if (feedbacks.length === 0) {
-        feedLista.innerHTML = '<p class="text-[10px] font-bold text-brand-gray/50 uppercase text-center py-10">Nenhum feedback registrado</p>';
+        feedLista.innerHTML = '<div class="col-span-full py-12 flex flex-col items-center opacity-30"><i class="ph-bold ph-chat-slash text-4xl mb-4"></i><p class="text-[10px] font-black uppercase">Nenhum feedback registrado</p></div>';
     } else {
         feedbacks.forEach(f => {
             const item = document.createElement('div');
-            item.className = "bg-brand-light p-5 rounded-2xl border border-gray-50 flex flex-col gap-2 text-left";
+            item.className = "bg-brand-light/50 p-6 rounded-[2rem] border border-gray-50 flex flex-col gap-4 text-left hover:bg-white hover:shadow-xl hover:shadow-brand-primary/5 transition-all group";
             item.innerHTML = `
-                <div class="flex justify-between items-center text-left">
-                    <span class="text-[9px] font-black text-brand-accent uppercase">${f.competencia}</span>
-                    <span class="text-[8px] font-bold text-brand-gray opacity-50">${new Date(f.data).toLocaleDateString()}</span>
+                <div class="flex justify-between items-start">
+                    <div class="bg-brand-accent/10 px-3 py-1 rounded-full border border-brand-accent/20">
+                        <span class="text-[8px] font-black text-brand-accent uppercase">${f.competencia}</span>
+                    </div>
+                    <span class="text-[8px] font-bold text-brand-gray opacity-40">${new Date(f.data).toLocaleDateString('pt-BR')}</span>
                 </div>
-                <p class="text-[10px] font-medium leading-relaxed italic text-brand-gray/80 text-left">"${f.comentario}"</p>
-                <div class="text-[8px] font-black text-brand-primary text-right uppercase">De: ${f.remetente}</div>
+                <p class="text-[11px] font-medium leading-relaxed italic text-brand-gray/80 text-left flex-1">"${f.comentario}"</p>
+                <div class="pt-4 border-t border-gray-100 flex items-center gap-3">
+                    <div class="w-6 h-6 bg-brand-primary rounded-lg flex items-center justify-center text-[10px] text-white font-black">${f.remetente.charAt(0)}</div>
+                    <div class="text-[9px] font-black text-brand-primary uppercase truncate">${f.remetente}</div>
+                </div>
             `;
             feedLista.appendChild(item);
         });
