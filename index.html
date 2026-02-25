@@ -37,361 +37,434 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="bg-brand-light text-brand-dark h-screen overflow-hidden flex">
+<body class="bg-brand-light text-brand-dark h-screen overflow-hidden">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <aside
-        class="sidebar w-80 bg-white h-full hidden md:flex flex-col justify-between border-r border-gray-100 relative z-20 rounded-r-[3.5rem] shadow-2xl shadow-blue-900/5">
-        <div class="p-10">
-            <div class="flex items-center gap-4 mb-14">
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 z-[200] bg-brand-primary flex items-center justify-center p-6">
+        <div
+            class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+        </div>
+        <div
+            class="glass-card w-full max-w-md p-12 rounded-[3.5rem] relative z-10 bg-white/95 backdrop-blur-xl shadow-2xl">
+            <div class="flex flex-col items-center gap-6 mb-10">
                 <div
-                    class="w-12 h-12 bg-brand-primary rounded-2xl flex items-center justify-center shadow-xl shadow-brand-primary/20">
-                    <i class="ph-fill ph-graduation-cap text-white text-2xl"></i>
+                    class="w-20 h-20 bg-brand-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-brand-primary/20">
+                    <i class="ph-fill ph-lock-key text-white text-4xl"></i>
                 </div>
-                <div>
-                    <div class="text-2xl font-black text-brand-primary tracking-tighter leading-none">COCAL<span
-                            class="text-brand-accent">.</span></div>
-                    <p class="text-[9px] font-black text-brand-accent tracking-[0.3em] mt-1 uppercase">Estágio 2026</p>
+                <div class="text-center">
+                    <h1 class="text-2xl font-black text-brand-primary tracking-tighter leading-none">ACESSO RESTRITO
+                    </h1>
+                    <p class="text-[10px] font-black text-brand-accent tracking-[0.3em] mt-2 uppercase">Gestão de
+                        Talentos Cocal</p>
                 </div>
             </div>
 
-            <nav class="space-y-4">
-                <button onclick="navigateTo('dashboard')" id="nav-dashboard"
-                    class="w-full flex items-center gap-5 px-8 py-5 rounded-[2rem] transition-all group nav-active">
-                    <i class="ph-fill ph-squares-four text-xl"></i>
-                    <span class="font-bold text-xs tracking-wider">VISÃO GERAL</span>
+            <form id="login-form" class="space-y-6" onsubmit="handleLogin(event)">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-brand-gray tracking-widest uppercase ml-4">Usuário</label>
+                    <input type="text" id="login-user" required
+                        class="w-full bg-brand-light p-5 rounded-2xl border border-gray-100 text-sm font-bold focus:border-brand-accent/50 outline-none transition-all"
+                        placeholder="Ex: gestao">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-brand-gray tracking-widest uppercase ml-4">Senha</label>
+                    <input type="password" id="login-pass" required
+                        class="w-full bg-brand-light p-5 rounded-2xl border border-gray-100 text-sm font-bold focus:border-brand-accent/50 outline-none transition-all"
+                        placeholder="••••••••">
+                </div>
+                <div id="login-error"
+                    class="hidden text-rose-500 text-[10px] font-black text-center uppercase tracking-wider bg-rose-50 py-3 rounded-xl border border-rose-100">
+                    Credenciais Inválidas
+                </div>
+                <button type="submit"
+                    class="w-full bg-brand-primary text-white font-black py-5 rounded-2xl hover:bg-brand-primary/90 transition-all shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-3 group">
+                    <span class="text-xs tracking-[0.2em]">ENTRAR NO SISTEMA</span>
+                    <i class="ph-bold ph-arrow-right text-lg group-hover:translate-x-1 transition-transform"></i>
                 </button>
-                <button onclick="navigateTo('trilhas')" id="nav-trilhas"
-                    class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
-                    <i class="ph-bold ph-airplane-takeoff text-xl"></i>
-                    <span class="font-bold text-xs tracking-wider">TRILHA DE EVOLUÇÃO</span>
-                </button>
-                <button onclick="navigateTo('atividades')" id="nav-atividades"
-                    class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
-                    <i class="ph-bold ph-list-checks text-xl"></i>
-                    <span class="font-bold text-xs tracking-wider">LOG DE ATIVIDADES</span>
-                </button>
-                <button onclick="navigateTo('promovidos')" id="nav-promovidos"
-                    class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
-                    <i class="ph-bold ph-trend-up text-xl"></i>
-                    <span class="font-bold text-xs tracking-wider uppercase">Cases de Sucesso</span>
-                </button>
-            </nav>
-        </div>
+            </form>
 
-        <!-- FOOTER SIDEBAR / EXPORTAÇÃO -->
-        <div class="p-10 space-y-6">
-            <div
-                class="bg-gradient-to-br from-brand-primary to-[#1a2f38] rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl">
-                <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-accent opacity-20 rounded-full"></div>
-                <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="w-2 h-2 rounded-full bg-brand-accent badge-pulse"></span>
-                        <p class="text-[9px] font-black tracking-[0.2em] opacity-80 uppercase">Sistema RH</p>
+            <p class="text-[9px] font-bold text-brand-gray text-center mt-10 opacity-50 uppercase tracking-widest">©
+                2026 Cocal - Todos os direitos reservados</p>
+        </div>
+    </div>
+
+    <!-- ESTRUTURA PRINCIPAL (ESCONDIDA INICIALMENTE) -->
+    <div id="main-layout" class="hidden h-screen w-full flex overflow-hidden">
+
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside
+            class="sidebar w-80 bg-white h-full hidden md:flex flex-col justify-between border-r border-gray-100 relative z-20 rounded-r-[3.5rem] shadow-2xl shadow-blue-900/5">
+            <div class="p-10">
+                <div class="flex items-center gap-4 mb-14">
+                    <div
+                        class="w-12 h-12 bg-brand-primary rounded-2xl flex items-center justify-center shadow-xl shadow-brand-primary/20">
+                        <i class="ph-fill ph-graduation-cap text-white text-2xl"></i>
                     </div>
-                    <h3 class="font-black text-xl leading-tight mb-6 uppercase tracking-tight">Exportação <br>Analítica
-                    </h3>
-                    <button onclick="exportarExcel()"
-                        class="w-full bg-brand-accent text-white text-[10px] font-black py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-download-simple text-lg"></i> GERAR RELATÓRIO
+                    <div>
+                        <div class="text-2xl font-black text-brand-primary tracking-tighter leading-none">COCAL<span
+                                class="text-brand-accent">.</span></div>
+                        <p class="text-[9px] font-black text-brand-accent tracking-[0.3em] mt-1 uppercase">Estágio 2026
+                        </p>
+                    </div>
+                </div>
+
+                <nav class="space-y-4">
+                    <button onclick="navigateTo('dashboard')" id="nav-dashboard"
+                        class="w-full flex items-center gap-5 px-8 py-5 rounded-[2rem] transition-all group nav-active">
+                        <i class="ph-fill ph-squares-four text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider">VISÃO GERAL</span>
+                    </button>
+                    <button onclick="navigateTo('trilhas')" id="nav-trilhas"
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
+                        <i class="ph-bold ph-airplane-takeoff text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider">TRILHA DE EVOLUÇÃO</span>
+                    </button>
+                    <button onclick="navigateTo('atividades')" id="nav-atividades"
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
+                        <i class="ph-bold ph-list-checks text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider">LOG DE ATIVIDADES</span>
+                    </button>
+                    <button onclick="navigateTo('promovidos')" id="nav-promovidos"
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
+                        <i class="ph-bold ph-trend-up text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider uppercase">Cases de Sucesso</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- FOOTER SIDEBAR / EXPORTAÇÃO -->
+            <div class="p-10 space-y-6">
+                <div
+                    class="bg-gradient-to-br from-brand-primary to-[#1a2f38] rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl">
+                    <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-accent opacity-20 rounded-full"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="w-2 h-2 rounded-full bg-brand-accent badge-pulse"></span>
+                            <p class="text-[9px] font-black tracking-[0.2em] opacity-80 uppercase">Sistema RH</p>
+                        </div>
+                        <h3 class="font-black text-xl leading-tight mb-6 uppercase tracking-tight">Exportação
+                            <br>Analítica
+                        </h3>
+                        <button onclick="exportarExcel()"
+                            class="w-full bg-brand-accent text-white text-[10px] font-black py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-download-simple text-lg"></i> GERAR RELATÓRIO
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="limparDados()"
+                    class="w-full py-4 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-2xl transition-colors flex items-center justify-center gap-2 group">
+                    <i class="ph-bold ph-trash-simple text-lg group-hover:shake"></i> RESETAR SISTEMA
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL (MAIN) -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+            <!-- CABEÇALHO (HEADER) -->
+            <header
+                class="h-28 px-12 flex items-center justify-between shrink-0 bg-white/60 backdrop-blur-md border-b border-gray-100/50 sticky top-0 z-10">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-3xl font-black text-brand-primary tracking-tight" id="page-title">VISÃO GERAL</h2>
+                    <div class="flex items-center gap-3">
+                        <p class="text-brand-gray text-[10px] font-bold tracking-[0.2em] uppercase">Mapeamento de
+                            Talentos •
+                            Ciclo 2026</p>
+                        <span class="h-1 w-1 rounded-full bg-brand-gray/30"></span>
+                        <p class="text-brand-accent text-[10px] font-black tracking-[0.2em] uppercase"
+                            id="current-date-display"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-8">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-black text-brand-primary uppercase">Maicon Bahls</p>
+                        <p class="text-[10px] font-bold text-brand-accent tracking-[0.2em] uppercase">Administrador do
+                            Programa</p>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-white border border-gray-100 rounded-[1.25rem] flex items-center justify-center shadow-sm relative group cursor-pointer overflow-hidden transition-all hover:border-brand-accent/30">
+                        <div
+                            class="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-5 transition-opacity">
+                        </div>
+                        <i class="ph-fill ph-user text-brand-primary text-2xl"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ÁREA DE SCROLL -->
+            <div class="flex-1 overflow-y-auto px-12 pb-12 pt-10" id="content-area">
+
+                <!-- TELA: DASHBOARD -->
+                <div id="view-dashboard" class="page-section page-transition">
+                    <!-- CARDS DE MÉTRICAS -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
+                                <i class="ph-fill ph-users-three text-8xl"></i>
+                            </div>
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">
+                                Estagiários
+                                Hoje</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-estagiarios">0</span>
+                                <span
+                                    class="text-xs font-black text-brand-accent mb-1 tracking-tighter uppercase">Ativos</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
+                                <i class="ph-fill ph-award text-8xl"></i>
+                            </div>
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">
+                                Efetivações
+                            </p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-concluidas">0</span>
+                                <span
+                                    class="text-xs font-black text-brand-accent mb-1 tracking-tighter uppercase">Promoções</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
+                                <i class="ph-fill ph-chart-line-up text-8xl"></i>
+                            </div>
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Taxa de
+                                Conversão</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-taxa">0%</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="glass-card p-10 rounded-[3rem] bg-gradient-to-br from-white to-brand-accent/[0.03] relative overflow-hidden group">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-[0.05] group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
+                                <i class="ph-fill ph-clock-countdown text-8xl text-brand-accent"></i>
+                            </div>
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Total
+                                Horas
+                            </p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-horas">0H</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div
+                            class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-50 h-[500px] relative overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-10">
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase">
+                                        Distribuição por Cargo</h3>
+                                    <p class="text-[9px] font-bold text-brand-gray uppercase">Mapeamento atual da base
+                                    </p>
+                                </div>
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center text-brand-primary">
+                                    <i class="ph-bold ph-chart-pie-slice"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 relative pb-4">
+                                <canvas id="chartComplexidade"></canvas>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-100 h-[500px] relative overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-10">
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase">
+                                        Evolução de
+                                        Talentos</h3>
+                                    <p class="text-[9px] font-bold text-brand-gray uppercase">Comparativo Ativos vs
+                                        Promovidos</p>
+                                </div>
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center text-brand-accent text-lg">
+                                    <i class="ph-bold ph-trend-up"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 relative pb-4">
+                                <canvas id="chartStatus"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: TRILHAS -->
+                <div id="view-trilhas" class="page-section hidden-section page-transition">
+                    <div class="bg-white p-16 rounded-[4rem] shadow-sm border border-gray-50">
+                        <div class="max-w-4xl mb-16">
+                            <span
+                                class="text-[10px] font-black text-brand-accent tracking-[0.5em] mb-6 block uppercase">Development
+                                Roadmap</span>
+                            <h3
+                                class="text-4xl font-black text-brand-primary mb-6 leading-tight uppercase tracking-tight">
+                                Jornada de Talentos <br><span class="text-brand-accent">Somar Ideias Cocal</span></h3>
+                        </div>
+
+                        <div class="flex gap-6 mb-20">
+                            <button
+                                class="px-10 py-5 bg-brand-primary text-white font-black rounded-3xl text-[11px] tracking-widest shadow-2xl shadow-brand-primary/20 hover:scale-[1.03] transition-transform active:scale-95 uppercase">Trilha
+                                6 Meses</button>
+                            <button
+                                class="px-10 py-5 bg-brand-light text-brand-gray font-black rounded-3xl text-[11px] tracking-widest border border-gray-100 hover:bg-white hover:border-brand-accent/30 transition-all active:scale-95 uppercase">Trilha
+                                12 Meses</button>
+                        </div>
+
+                        <div class="timeline-container relative px-4 text-left">
+                            <div class="timeline-item group">
+                                <div class="timeline-dot group-hover:scale-125 transition-transform duration-300"></div>
+                                <div class="flex flex-col gap-4">
+                                    <span
+                                        class="text-[10px] font-black text-brand-accent tracking-[0.3em] bg-brand-accent/10 px-6 py-2 rounded-full w-max uppercase border border-brand-accent/20">Mês
+                                        01</span>
+                                    <h3 class="text-2xl font-black text-brand-dark tracking-tight uppercase">
+                                        Introdutório
+                                    </h3>
+                                    <p
+                                        class="text-sm text-brand-gray font-medium normal-case max-w-2xl leading-relaxed bg-brand-light/50 p-6 rounded-3xl border border-gray-50 uppercase">
+                                        Integração e Cultura Cocal.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item group last-item pb-4">
+                                <div
+                                    class="timeline-dot group-hover:scale-125 transition-transform duration-300 ring-4 ring-purple-100 bg-purple-500">
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <span
+                                        class="text-[10px] font-black text-purple-600 tracking-[0.25em] bg-purple-100 px-6 py-2 rounded-full w-max uppercase border border-purple-200">Mês
+                                        06</span>
+                                    <h3 class="text-2xl font-black text-brand-dark tracking-tight uppercase">Efetivação
+                                    </h3>
+                                    <p
+                                        class="text-sm text-brand-gray font-medium normal-case max-w-2xl leading-relaxed bg-brand-light/50 p-6 rounded-3xl border border-gray-50 uppercase">
+                                        Avaliação final e promoção para Jovem Profissional.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: PROMOVIDOS (CASES DE SUCESSO) -->
+                <div id="view-promovidos" class="page-section hidden-section page-transition text-left">
+                    <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[700px]">
+                        <div class="flex flex-col gap-2 mb-14">
+                            <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Cases de Sucesso
+                            </h3>
+                            <div class="flex items-center gap-3">
+                                <span class="w-2 h-2 rounded-full bg-brand-accent badge-pulse"></span>
+                                <p class="text-[10px] font-black text-brand-gray tracking-[0.2em] uppercase">Estagiários
+                                    que
+                                    conquistaram a efetivação no programa</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16" id="promovidos-cards">
+                            <!-- Cards preenchidos dinamicamente -->
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black text-brand-gray/60 tracking-[0.25em] border-b border-gray-50 uppercase">
+                                        <th class="pb-8 pl-6">Matrícula</th>
+                                        <th class="pb-8">Colaborador</th>
+                                        <th class="pb-8">Novo Cargo</th>
+                                        <th class="pb-8 text-right pr-6">Data Promoção</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-promovidos-body" class="divide-y divide-gray-50/50">
+                                    <!-- Preenchido via app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: LOG DE ATIVIDADES -->
+                <div id="view-atividades" class="page-section hidden-section page-transition text-left">
+                    <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[700px]">
+                        <div class="flex justify-between items-center mb-14">
+                            <div class="flex flex-col gap-1">
+                                <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Log de
+                                    Talentos
+                                </h3>
+                                <p class="text-[10px] font-black text-brand-gray tracking-[0.2em] uppercase">Gestão da
+                                    Base
+                                    de Ativos</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <label
+                                    class="cursor-pointer bg-brand-accent text-white px-8 py-4 rounded-[1.5rem] font-black text-[11px] tracking-widest flex items-center gap-3 hover:translate-y-[-4px] hover:shadow-2xl hover:shadow-brand-accent/40 transition-all active:scale-95 group uppercase">
+                                    <i class="ph-bold ph-database text-xl"></i> Importar CSV
+                                    <input type="file" id="uploadAtividadesCsv" class="hidden" accept=".csv" />
+                                </label>
+                                <input type="text" id="buscaAtividades" placeholder="Pesquisar..."
+                                    class="bg-brand-light p-4 rounded-[1.5rem] border border-gray-100 text-[11px] font-black w-72 uppercase shadow-inner">
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black text-brand-gray/60 tracking-[0.25em] border-b border-gray-50 uppercase">
+                                        <th class="pb-8 pl-6">ID</th>
+                                        <th class="pb-8">Colaborador</th>
+                                        <th class="pb-8">Cargo Atual</th>
+                                        <th class="pb-8 text-center">H / M</th>
+                                        <th class="pb-8 text-right pr-6">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-atividades-body" class="divide-y divide-gray-50/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- MODAL DE DETALHES -->
+        <div id="modal-detalhes" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-8 modal-bg">
+            <div
+                class="bg-white w-full max-w-2xl rounded-[4rem] shadow-2xl overflow-hidden page-transition border border-white/20">
+                <div class="p-12 border-b border-gray-50 flex justify-between items-center bg-brand-light/40 text-left">
+                    <div class="flex flex-col gap-2">
+                        <span class="text-[10px] font-black text-brand-accent tracking-[0.4em] uppercase">Análise
+                            Individual</span>
+                        <h3 class="font-black text-brand-primary text-2xl uppercase tracking-tight">Registro Completo
+                        </h3>
+                    </div>
+                    <button onclick="fecharModal()"
+                        class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 transition-all border border-gray-100 uppercase">
+                        <i class="ph-bold ph-x text-xl"></i>
                     </button>
                 </div>
-            </div>
-
-            <button onclick="limparDados()"
-                class="w-full py-4 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-2xl transition-colors flex items-center justify-center gap-2 group">
-                <i class="ph-bold ph-trash-simple text-lg group-hover:shake"></i> RESETAR SISTEMA
-            </button>
-        </div>
-    </aside>
-
-    <!-- CONTEÚDO PRINCIPAL (MAIN) -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-
-        <!-- CABEÇALHO (HEADER) -->
-        <header
-            class="h-28 px-12 flex items-center justify-between shrink-0 bg-white/60 backdrop-blur-md border-b border-gray-100/50 sticky top-0 z-10">
-            <div class="flex flex-col gap-1">
-                <h2 class="text-3xl font-black text-brand-primary tracking-tight" id="page-title">VISÃO GERAL</h2>
-                <div class="flex items-center gap-3">
-                    <p class="text-brand-gray text-[10px] font-bold tracking-[0.2em] uppercase">Mapeamento de Talentos •
-                        Ciclo 2026</p>
-                    <span class="h-1 w-1 rounded-full bg-brand-gray/30"></span>
-                    <p class="text-brand-accent text-[10px] font-black tracking-[0.2em] uppercase"
-                        id="current-date-display"></p>
+                <div class="p-12 space-y-10 text-left" id="modal-content"></div>
+                <div class="px-12 py-10 bg-brand-light flex justify-between items-center">
+                    <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase opacity-60 uppercase">
+                        Cocal
+                        2026</p>
+                    <button onclick="fecharModal()"
+                        class="px-10 py-4 bg-brand-primary text-white font-black text-[11px] tracking-widest rounded-2xl shadow-xl shadow-brand-primary/20 transition-all uppercase">Fechar</button>
                 </div>
-            </div>
-            <div class="flex items-center gap-8">
-                <div class="text-right hidden sm:block">
-                    <p class="text-sm font-black text-brand-primary uppercase">Maicon Bahls</p>
-                    <p class="text-[10px] font-bold text-brand-accent tracking-[0.2em] uppercase">Administrador do
-                        Programa</p>
-                </div>
-                <div
-                    class="w-14 h-14 bg-white border border-gray-100 rounded-[1.25rem] flex items-center justify-center shadow-sm relative group cursor-pointer overflow-hidden transition-all hover:border-brand-accent/30">
-                    <div class="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-5 transition-opacity">
-                    </div>
-                    <i class="ph-fill ph-user text-brand-primary text-2xl"></i>
-                </div>
-            </div>
-        </header>
-
-        <!-- ÁREA DE SCROLL -->
-        <div class="flex-1 overflow-y-auto px-12 pb-12 pt-10" id="content-area">
-
-            <!-- TELA: DASHBOARD -->
-            <div id="view-dashboard" class="page-section page-transition">
-                <!-- CARDS DE MÉTRICAS -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                    <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
-                        <div
-                            class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
-                            <i class="ph-fill ph-users-three text-8xl"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Estagiários
-                            Hoje</p>
-                        <div class="flex items-end gap-3">
-                            <span class="text-5xl font-black text-brand-primary leading-none"
-                                id="kpi-estagiarios">0</span>
-                            <span
-                                class="text-xs font-black text-brand-accent mb-1 tracking-tighter uppercase">Ativos</span>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
-                        <div
-                            class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
-                            <i class="ph-fill ph-award text-8xl"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Efetivações
-                        </p>
-                        <div class="flex items-end gap-3">
-                            <span class="text-5xl font-black text-brand-primary leading-none"
-                                id="kpi-concluidas">0</span>
-                            <span
-                                class="text-xs font-black text-brand-accent mb-1 tracking-tighter uppercase">Promoções</span>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
-                        <div
-                            class="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform group-hover:scale-110 duration-500">
-                            <i class="ph-fill ph-chart-line-up text-8xl"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Taxa de
-                            Conversão</p>
-                        <div class="flex items-end gap-3">
-                            <span class="text-5xl font-black text-brand-primary leading-none" id="kpi-taxa">0%</span>
-                        </div>
-                    </div>
-
-                    <div
-                        class="glass-card p-10 rounded-[3rem] bg-gradient-to-br from-white to-brand-accent/[0.03] relative overflow-hidden group">
-                        <div
-                            class="absolute top-0 right-0 p-6 opacity-[0.05] group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
-                            <i class="ph-fill ph-clock-countdown text-8xl text-brand-accent"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Total Horas
-                        </p>
-                        <div class="flex items-end gap-3">
-                            <span class="text-5xl font-black text-brand-primary leading-none" id="kpi-horas">0H</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- GRÁFICOS -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <div
-                        class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-50 h-[500px] relative overflow-hidden flex flex-col">
-                        <div class="flex justify-between items-center mb-10">
-                            <div class="flex flex-col gap-1">
-                                <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase">
-                                    Distribuição por Cargo</h3>
-                                <p class="text-[9px] font-bold text-brand-gray uppercase">Mapeamento atual da base</p>
-                            </div>
-                            <div
-                                class="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center text-brand-primary">
-                                <i class="ph-bold ph-chart-pie-slice"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 relative pb-4">
-                            <canvas id="chartComplexidade"></canvas>
-                        </div>
-                    </div>
-                    <div
-                        class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-100 h-[500px] relative overflow-hidden flex flex-col">
-                        <div class="flex justify-between items-center mb-10">
-                            <div class="flex flex-col gap-1">
-                                <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase">Evolução de
-                                    Talentos</h3>
-                                <p class="text-[9px] font-bold text-brand-gray uppercase">Comparativo Ativos vs
-                                    Promovidos</p>
-                            </div>
-                            <div
-                                class="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center text-brand-accent text-lg">
-                                <i class="ph-bold ph-trend-up"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 relative pb-4">
-                            <canvas id="chartStatus"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TELA: TRILHAS -->
-            <div id="view-trilhas" class="page-section hidden-section page-transition">
-                <div class="bg-white p-16 rounded-[4rem] shadow-sm border border-gray-50">
-                    <div class="max-w-4xl mb-16">
-                        <span
-                            class="text-[10px] font-black text-brand-accent tracking-[0.5em] mb-6 block uppercase">Development
-                            Roadmap</span>
-                        <h3 class="text-4xl font-black text-brand-primary mb-6 leading-tight uppercase tracking-tight">
-                            Jornada de Talentos <br><span class="text-brand-accent">Somar Ideias Cocal</span></h3>
-                    </div>
-
-                    <div class="flex gap-6 mb-20">
-                        <button
-                            class="px-10 py-5 bg-brand-primary text-white font-black rounded-3xl text-[11px] tracking-widest shadow-2xl shadow-brand-primary/20 hover:scale-[1.03] transition-transform active:scale-95 uppercase">Trilha
-                            6 Meses</button>
-                        <button
-                            class="px-10 py-5 bg-brand-light text-brand-gray font-black rounded-3xl text-[11px] tracking-widest border border-gray-100 hover:bg-white hover:border-brand-accent/30 transition-all active:scale-95 uppercase">Trilha
-                            12 Meses</button>
-                    </div>
-
-                    <div class="timeline-container relative px-4 text-left">
-                        <div class="timeline-item group">
-                            <div class="timeline-dot group-hover:scale-125 transition-transform duration-300"></div>
-                            <div class="flex flex-col gap-4">
-                                <span
-                                    class="text-[10px] font-black text-brand-accent tracking-[0.3em] bg-brand-accent/10 px-6 py-2 rounded-full w-max uppercase border border-brand-accent/20">Mês
-                                    01</span>
-                                <h3 class="text-2xl font-black text-brand-dark tracking-tight uppercase">Introdutório
-                                </h3>
-                                <p
-                                    class="text-sm text-brand-gray font-medium normal-case max-w-2xl leading-relaxed bg-brand-light/50 p-6 rounded-3xl border border-gray-50 uppercase">
-                                    Integração e Cultura Cocal.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item group last-item pb-4">
-                            <div
-                                class="timeline-dot group-hover:scale-125 transition-transform duration-300 ring-4 ring-purple-100 bg-purple-500">
-                            </div>
-                            <div class="flex flex-col gap-4">
-                                <span
-                                    class="text-[10px] font-black text-purple-600 tracking-[0.25em] bg-purple-100 px-6 py-2 rounded-full w-max uppercase border border-purple-200">Mês
-                                    06</span>
-                                <h3 class="text-2xl font-black text-brand-dark tracking-tight uppercase">Efetivação</h3>
-                                <p
-                                    class="text-sm text-brand-gray font-medium normal-case max-w-2xl leading-relaxed bg-brand-light/50 p-6 rounded-3xl border border-gray-50 uppercase">
-                                    Avaliação final e promoção para Jovem Profissional.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TELA: PROMOVIDOS (CASES DE SUCESSO) -->
-            <div id="view-promovidos" class="page-section hidden-section page-transition text-left">
-                <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[700px]">
-                    <div class="flex flex-col gap-2 mb-14">
-                        <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Cases de Sucesso
-                        </h3>
-                        <div class="flex items-center gap-3">
-                            <span class="w-2 h-2 rounded-full bg-brand-accent badge-pulse"></span>
-                            <p class="text-[10px] font-black text-brand-gray tracking-[0.2em] uppercase">Estagiários que
-                                conquistaram a efetivação no programa</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16" id="promovidos-cards">
-                        <!-- Cards preenchidos dinamicamente -->
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr
-                                    class="text-[10px] font-black text-brand-gray/60 tracking-[0.25em] border-b border-gray-50 uppercase">
-                                    <th class="pb-8 pl-6">Matrícula</th>
-                                    <th class="pb-8">Colaborador</th>
-                                    <th class="pb-8">Novo Cargo</th>
-                                    <th class="pb-8 text-right pr-6">Data Promoção</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-promovidos-body" class="divide-y divide-gray-50/50">
-                                <!-- Preenchido via app.js -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TELA: LOG DE ATIVIDADES -->
-            <div id="view-atividades" class="page-section hidden-section page-transition text-left">
-                <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[700px]">
-                    <div class="flex justify-between items-center mb-14">
-                        <div class="flex flex-col gap-1">
-                            <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Log de Talentos
-                            </h3>
-                            <p class="text-[10px] font-black text-brand-gray tracking-[0.2em] uppercase">Gestão da Base
-                                de Ativos</p>
-                        </div>
-                        <div class="flex gap-4">
-                            <label
-                                class="cursor-pointer bg-brand-accent text-white px-8 py-4 rounded-[1.5rem] font-black text-[11px] tracking-widest flex items-center gap-3 hover:translate-y-[-4px] hover:shadow-2xl hover:shadow-brand-accent/40 transition-all active:scale-95 group uppercase">
-                                <i class="ph-bold ph-database text-xl"></i> Importar CSV
-                                <input type="file" id="uploadAtividadesCsv" class="hidden" accept=".csv" />
-                            </label>
-                            <input type="text" id="buscaAtividades" placeholder="Pesquisar..."
-                                class="bg-brand-light p-4 rounded-[1.5rem] border border-gray-100 text-[11px] font-black w-72 uppercase shadow-inner">
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr
-                                    class="text-[10px] font-black text-brand-gray/60 tracking-[0.25em] border-b border-gray-50 uppercase">
-                                    <th class="pb-8 pl-6">ID</th>
-                                    <th class="pb-8">Colaborador</th>
-                                    <th class="pb-8">Cargo Atual</th>
-                                    <th class="pb-8 text-center">H / M</th>
-                                    <th class="pb-8 text-right pr-6">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-atividades-body" class="divide-y divide-gray-50/50"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- MODAL DE DETALHES -->
-    <div id="modal-detalhes" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-8 modal-bg">
-        <div
-            class="bg-white w-full max-w-2xl rounded-[4rem] shadow-2xl overflow-hidden page-transition border border-white/20">
-            <div class="p-12 border-b border-gray-50 flex justify-between items-center bg-brand-light/40 text-left">
-                <div class="flex flex-col gap-2">
-                    <span class="text-[10px] font-black text-brand-accent tracking-[0.4em] uppercase">Análise
-                        Individual</span>
-                    <h3 class="font-black text-brand-primary text-2xl uppercase tracking-tight">Registro Completo</h3>
-                </div>
-                <button onclick="fecharModal()"
-                    class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 transition-all border border-gray-100 uppercase">
-                    <i class="ph-bold ph-x text-xl"></i>
-                </button>
-            </div>
-            <div class="p-12 space-y-10 text-left" id="modal-content"></div>
-            <div class="px-12 py-10 bg-brand-light flex justify-between items-center">
-                <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase opacity-60 uppercase">Cocal
-                    2026</p>
-                <button onclick="fecharModal()"
-                    class="px-10 py-4 bg-brand-primary text-white font-black text-[11px] tracking-widest rounded-2xl shadow-xl shadow-brand-primary/20 transition-all uppercase">Fechar</button>
             </div>
         </div>
+
     </div>
 
     <script src="app.js"></script>

@@ -2,7 +2,9 @@
 
 const CONFIG = {
     STORAGE_KEY: 'cocal_metrics_2026',
-    DATE_DISPLAY_ID: 'current-date-display'
+    AUTH_KEY: 'cocal_auth_session',
+    DATE_DISPLAY_ID: 'current-date-display',
+    CREDENTIALS: { user: 'gestao', pass: 'cocal@2025' }
 };
 
 // DADOS REAIS EXTRAÍDOS DA BASE (Mapeamento Inicial)
@@ -46,6 +48,7 @@ let db = INITIAL_DATA.ativos; // Base de ativos padrão
 
 // INICIALIZAÇÃO
 document.addEventListener('DOMContentLoaded', async () => {
+    checkAuth();
     initClock();
     await carregarDadosExternos();
     carregarPersistencia();
@@ -57,6 +60,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buscaEl = document.getElementById('buscaAtividades');
     if (buscaEl) buscaEl.addEventListener('input', (e) => filtrarTabela(e.target.value));
 });
+
+function checkAuth() {
+    const isLogged = sessionStorage.getItem(CONFIG.AUTH_KEY);
+    if (isLogged === 'true') {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-layout').classList.remove('hidden');
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById('login-user').value;
+    const pass = document.getElementById('login-pass').value;
+    const errorEl = document.getElementById('login-error');
+
+    if (user === CONFIG.CREDENTIALS.user && pass === CONFIG.CREDENTIALS.pass) {
+        sessionStorage.setItem(CONFIG.AUTH_KEY, 'true');
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-layout').classList.remove('hidden');
+        errorEl.classList.add('hidden');
+    } else {
+        errorEl.classList.remove('hidden');
+        // Shake animation for error
+        const form = document.getElementById('login-form');
+        form.classList.add('animate-shake');
+        setTimeout(() => form.classList.remove('animate-shake'), 500);
+    }
+}
 
 async function carregarDadosExternos() {
     try {
