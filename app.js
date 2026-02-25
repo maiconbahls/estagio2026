@@ -294,6 +294,8 @@ function renderizarTabela(data) {
         const role = mapearColuna(row, ['CARGO', 'FUNCAO']) || 'ESTAGIARIO';
         const hours = mapearColuna(row, ['HORAS', 'TEMPO']) || '0';
         const status = String(mapearColuna(row, ['STATUS', 'SITUACAO']) || 'ATIVO').toUpperCase();
+        const inicio = mapearColuna(row, ['ADMISSAO', 'INICIO']) || '-';
+        const termino = mapearColuna(row, ['TERMINO', 'FIM', 'CONTRATO']) || '-';
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-brand-light transition-all cursor-pointer group";
@@ -301,7 +303,8 @@ function renderizarTabela(data) {
         tr.innerHTML = `
             <td class="py-6 pl-6 font-mono text-[9px] font-black text-brand-primary opacity-60">${mapearColuna(row, ['MATRICULA', 'ID']) || '-'}</td>
             <td class="py-6 font-black text-[11px] text-brand-dark group-hover:text-brand-accent transition-colors uppercase">${name}</td>
-            <td class="py-6 text-[10px] font-bold text-brand-gray uppercase">${role}</td>
+            <td class="py-6 text-[10px] font-bold text-brand-gray uppercase">${inicio}</td>
+            <td class="py-6 text-[10px] font-bold text-brand-gray uppercase">${termino}</td>
             <td class="py-6 text-center font-black text-[10px] text-brand-primary">${hours}H</td>
             <td class="py-6 text-right pr-6">
                 <span class="px-4 py-1.5 rounded-xl text-[8px] font-black shadow-lg ${status.includes('CONCLU') ? 'bg-brand-accent text-white' : 'bg-slate-100 text-slate-500'}">
@@ -373,7 +376,15 @@ function verMais(ix) {
                 </div>
             </div>
             <div>
-                <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase mb-2">Cargo</p>
+                <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase mb-2">Início Trilha</p>
+                <h4 class="font-bold text-sm uppercase">${mapearColuna(data, ['ADMISSAO', 'INICIO']) || '-'}</h4>
+            </div>
+            <div>
+                <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase mb-2">Término Contrato</p>
+                <h4 class="font-black text-sm uppercase">${mapearColuna(data, ['TERMINO', 'FIM', 'CONTRATO']) || '-'}</h4>
+            </div>
+            <div>
+                <p class="text-[9px] font-black text-brand-gray tracking-widest uppercase mb-2">Cargo Atual</p>
                 <h4 class="font-bold text-xs uppercase">${mapearColuna(data, ['CARGO', 'FUNCAO']) || 'ESTAGIÁRIO'}</h4>
             </div>
             <div>
