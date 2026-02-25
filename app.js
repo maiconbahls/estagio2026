@@ -47,7 +47,10 @@ const INITIAL_DATA = {
 
 let chartCompInstance = null;
 let chartStatusInstance = null;
-let db = INITIAL_DATA.ativos; // Base de ativos padrão
+let chartFeedbackComp = null;
+let chartFeedbackRem = null;
+let db = INITIAL_DATA.ativos;
+let feedbackDB = []; // Base de feedbacks
 
 // INICIALIZAÇÃO
 document.addEventListener('DOMContentLoaded', async () => {
@@ -207,12 +210,14 @@ function navigateTo(id) {
         dashboard: 'VISÃO GERAL DO PROGRAMA',
         trilhas: 'TRILHA ESTRATÉGICA',
         atividades: 'GESTÃO SEMANAL',
-        promovidos: 'CASES DE SUCESSO'
+        promovidos: 'CASES DE SUCESSO',
+        indicadores: 'INDICADORES DE FEEDBACK'
     };
     const titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.innerText = map[id] || 'PROGRAMA DE ESTÁGIO';
 
     if (id === 'promovidos') renderizarPromovidos();
+    if (id === 'indicadores') sincronizarFeedbacks();
 }
 
 // PERSISTÊNCIA DE DADOS
@@ -459,11 +464,92 @@ function filtrarTabela(val) {
     renderizarTabela(filtered);
 }
 
-function exportarExcel() {
-    let content = "data:text/csv;charset=ISO-8859-1,MATRICULA;COLABORADOR;CARGO;ADMISSAO\n";
-    db.forEach(r => content += `${mapearColuna(r, ['MATRICULA'])};${mapearColuna(r, ['COLABORADOR'])};${mapearColuna(r, ['CARGO'])};${mapearColuna(r, ['ADMISSAO'])}\n`);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodeURI(content));
-    link.setAttribute("download", `GESTAO_ESTAGIO_COCAL_2026.csv`);
-    link.click();
+// GESTÃO DE FEEDBACKS (INDICADORES)
+async function sincronizarFeedbacks() {
+    if (CONFIG.API_URL === 'SUA_URL_DO_APPS_SCRIPT_AQUI') return;
+
+    const tbody = document.getElementById('tabela-feedback-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center font-black text-brand-gray animate-pulse">CARREGANDO DADOS DA PLANILHA...</td></tr>';
+
+    try {
+        const response = await fetch(CONFIG.API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'getFeedbacks' })
+        });
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            feedbackDB = data;
+            renderizarIndicadores();
+        }
+    } catch (err) {
+        console.error("Erro ao buscar feedbacks:", err);
+    }
+}
+
+function renderizarIndicadores() {
+    const tbody = document.getElementById('tabela-feedback-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const compStats = {};
+    const remStats = {};
+    let mesCount = 0;
+    const trintaDias = new Date();
+    trintaDias.setDate(trintaDias.getDate() - 30);
+
+    feedbackDB.forEach(f => {
+        const dataF = new Date(f.data);
+        if (dataF > trintaDias) mesCount++;
+
+        compStats[f.competencia] = (compStats[f.competencia] || 0) + 1;
+        remStats[f.remetente] = (remStats[f.remetente] || 0) + 1;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-brand-light transition-all uppercase";
+        tr.innerHTML = `
+            <td class="py-6 pl-6 font-mono text-[9px] font-black text-brand-primary opacity-60">${new Date(f.data).toLocaleDateString()}</td>
+            <td class="py-6 font-black text-[11px] text-brand-dark">${f.colaborador}</td>
+            <td class="py-6 text-[10px] font-bold text-brand-accent">${f.competencia}</td>
+            <td class="py-6 text-[10px] font-bold text-brand-gray">${f.remetente}</td>
+            <td class="py-6 pr-6 text-[10px] font-medium normal-case italic text-brand-gray/80 max-w-xs truncate" title="${f.comentario}">${f.comentario}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Atualizar KPIs
+    document.getElementById('kpi-total-feedback').innerText = feedbackDB.length;
+    document.getElementById('kpi-total-competencias').innerText = Object.keys(compStats).length;
+    document.getElementById('kpi-feedback-mes').innerText = mesCount;
+
+    renderFeedbackCharts(compStats, remStats);
+}
+
+function renderFeedbackCharts(compStats, remStats) {
+    const ctxC = document.getElementById('chartFeedbackComp');
+    if (ctxC) {
+        if (chartFeedbackComp) chartFeedbackComp.destroy();
+        chartFeedbackComp = new Chart(ctxC.getContext('2d'), {
+            type: 'polarArea',
+            data: {
+                labels: Object.keys(compStats),
+                datasets: [{ data: Object.values(compStats), backgroundColor: ['#30515F', '#76B82A', '#E2E8F0', '#64748B', '#F1F5F9'] }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { weight: '900', size: 8 } } } } }
+        });
+    }
+
+    const ctxR = document.getElementById('chartFeedbackRemetente');
+    if (ctxR) {
+        if (chartFeedbackRem) chartFeedbackRem.destroy();
+        const sortedRem = Object.entries(remStats).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        chartFeedbackRem = new Chart(ctxR.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: sortedRem.map(r => r[0]),
+                datasets: [{ label: 'Feedbacks Enviados', data: sortedRem.map(r => r[1]), backgroundColor: '#76B82A', borderRadius: 8 }]
+            },
+            options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
+    }
 }

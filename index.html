@@ -60,10 +60,11 @@
 
             <form id="login-form" class="space-y-6" onsubmit="handleLogin(event)">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black text-brand-gray tracking-widest uppercase ml-4">Usuário</label>
+                    <label class="text-[10px] font-black text-brand-gray tracking-widest uppercase ml-4">Usuário /
+                        Matrícula</label>
                     <input type="text" id="login-user" required
                         class="w-full bg-brand-light p-5 rounded-2xl border border-gray-100 text-sm font-bold focus:border-brand-accent/50 outline-none transition-all"
-                        placeholder="Ex: gestao">
+                        placeholder="Ex: gestao ou 123456">
                 </div>
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-brand-gray tracking-widest uppercase ml-4">Senha</label>
@@ -119,7 +120,7 @@
                         <span class="font-bold text-xs tracking-wider">TRILHA DE EVOLUÇÃO</span>
                     </button>
                     <button onclick="navigateTo('atividades')" id="nav-atividades"
-                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group">
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group admin-only">
                         <i class="ph-bold ph-list-checks text-xl"></i>
                         <span class="font-bold text-xs tracking-wider">LOG DE ATIVIDADES</span>
                     </button>
@@ -128,11 +129,16 @@
                         <i class="ph-bold ph-trend-up text-xl"></i>
                         <span class="font-bold text-xs tracking-wider uppercase">Cases de Sucesso</span>
                     </button>
+                    <button onclick="navigateTo('indicadores')" id="nav-indicadores"
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group admin-only">
+                        <i class="ph-bold ph-chart-bar text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider uppercase">Indicadores Feedback</span>
+                    </button>
                 </nav>
             </div>
 
             <!-- FOOTER SIDEBAR / EXPORTAÇÃO -->
-            <div class="p-10 space-y-6">
+            <div class="p-10 space-y-6 admin-only">
                 <div
                     class="bg-gradient-to-br from-brand-primary to-[#1a2f38] rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl">
                     <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-accent opacity-20 rounded-full"></div>
@@ -150,10 +156,19 @@
                         </button>
                     </div>
                 </div>
+            </div>
 
+            <div class="p-10 pt-0 admin-only">
                 <button onclick="limparDados()"
                     class="w-full py-4 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-2xl transition-colors flex items-center justify-center gap-2 group">
                     <i class="ph-bold ph-trash-simple text-lg group-hover:shake"></i> RESETAR SISTEMA
+                </button>
+            </div>
+
+            <div class="p-10 pt-0">
+                <button onclick="logout()"
+                    class="w-full py-4 text-[10px] font-black text-slate-400 hover:bg-slate-50 rounded-2xl transition-colors flex items-center justify-center gap-2 group">
+                    <i class="ph-bold ph-sign-out text-lg"></i> SAIR DO SISTEMA
                 </button>
             </div>
         </aside>
@@ -352,6 +367,83 @@
                                         Avaliação final e promoção para Jovem Profissional.</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: INDICADORES FEEDBACK -->
+                <div id="view-indicadores" class="page-section hidden-section page-transition text-left">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Total
+                                Feedbacks</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-total-feedback">0</span>
+                            </div>
+                        </div>
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">
+                                Competências</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-total-competencias">0</span>
+                            </div>
+                        </div>
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Últimos 30
+                                dias</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-brand-primary leading-none"
+                                    id="kpi-feedback-mes">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+                        <div
+                            class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-50 h-[450px] flex flex-col">
+                            <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase mb-10">Volume
+                                por Competência</h3>
+                            <div class="flex-1 relative">
+                                <canvas id="chartFeedbackComp"></canvas>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-gray-100 h-[450px] flex flex-col">
+                            <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase mb-10">Top
+                                Remetentes</h3>
+                            <div class="flex-1 relative">
+                                <canvas id="chartFeedbackRemetente"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[500px]">
+                        <div class="flex justify-between items-center mb-14">
+                            <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Histórico de
+                                Feedbacks</h3>
+                            <div class="flex gap-4">
+                                <button onclick="sincronizarFeedbacks()"
+                                    class="bg-brand-primary text-white px-8 py-4 rounded-[1.5rem] font-black text-[11px] tracking-widest flex items-center gap-3 hover:scale-105 transition-all active:scale-95 uppercase">
+                                    <i class="ph-bold ph-arrows-clockwise text-xl"></i> Atualizar Dados
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black text-brand-gray/60 tracking-[0.25em] border-b border-gray-50 uppercase">
+                                        <th class="pb-8 pl-6">Data</th>
+                                        <th class="pb-8">Colaborador</th>
+                                        <th class="pb-8">Competência</th>
+                                        <th class="pb-8">Remetente</th>
+                                        <th class="pb-8 pr-6">Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-feedback-body" class="divide-y divide-gray-50/50"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
