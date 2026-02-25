@@ -49,6 +49,7 @@ let chartCompInstance = null;
 let chartStatusInstance = null;
 let chartFeedbackComp = null;
 let chartFeedbackRem = null;
+let chartIndividualInstance = null;
 let db = INITIAL_DATA.ativos;
 let feedbackDB = []; // Base de feedbacks
 
@@ -70,6 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const buscaEl = document.getElementById('buscaAtividades');
     if (buscaEl) buscaEl.addEventListener('input', (e) => filtrarTabela(e.target.value));
+
+    const buscaGeralEl = document.getElementById('buscaColaboradoresGeral');
+    if (buscaGeralEl) buscaGeralEl.addEventListener('input', (e) => filtrarColaboradoresGeral(e.target.value));
 });
 
 function checkAuth() {
@@ -217,6 +221,7 @@ function navigateTo(id) {
 
     if (id === 'promovidos') renderizarPromovidos();
     if (id === 'indicadores') sincronizarFeedbacks();
+    if (id === 'colaboradores') renderizarListaColaboradores();
 }
 
 // PERSISTÊNCIA DE DADOS
@@ -562,4 +567,154 @@ function renderFeedbackCharts(compStats, remStats) {
             options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     }
+}
+
+// GESTÃO DE COLABORADORES (LISTA GERAL E DASHBOARD INDIVIDUAL)
+function renderizarListaColaboradores(filtro = '') {
+    const grid = document.getElementById('lista-colaboradores-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const f = filtro.toUpperCase();
+
+    // Unificar ativos e promovidos
+    const todos = [
+        ...db.map(x => ({ ...x, _tipo: 'ATIVO' })),
+        ...INITIAL_DATA.promovidos.map(x => ({ ...x, _tipo: 'PROMOVIDO' }))
+    ];
+
+    todos.filter(item => {
+        const nome = (mapearColuna(item, ['COLABORADOR', 'NOME']) || '').toUpperCase();
+        const mat = String(mapearColuna(item, ['MATRICULA', 'ID']) || '').toUpperCase();
+        return nome.includes(f) || mat.includes(f);
+    }).forEach(item => {
+        const nome = mapearColuna(item, ['COLABORADOR', 'NOME']) || 'NOME';
+        const mat = mapearColuna(item, ['MATRICULA', 'ID']) || '-';
+        const status = item._tipo;
+
+        const card = document.createElement('div');
+        card.className = "bg-brand-light/50 p-8 rounded-[2.5rem] border border-gray-100 hover:border-brand-accent/50 hover:bg-white transition-all cursor-pointer group relative overflow-hidden";
+        card.onclick = () => abrirDashboardIndividual(item);
+        card.innerHTML = `
+            <div class="flex items-center gap-5 mb-6 text-left">
+                <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                    <i class="ph-fill ph-user text-2xl text-brand-primary opacity-40"></i>
+                </div>
+                <div class="flex-1 truncate">
+                    <h4 class="font-black text-brand-primary text-xs uppercase truncate">${nome}</h4>
+                    <p class="text-[9px] font-bold text-brand-gray tracking-widest uppercase">Mat: ${mat}</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-[9px] font-black tracking-widest uppercase ${status === 'ATIVO' ? 'text-brand-accent' : 'text-purple-500'}">${status}</span>
+                <i class="ph-bold ph-arrow-right text-brand-accent opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function filtrarColaboradoresGeral(val) {
+    renderizarListaColaboradores(val);
+}
+
+function abrirDashboardIndividual(colaborador) {
+    const nome = mapearColuna(colaborador, ['COLABORADOR', 'NOME']) || 'COLABORADOR';
+    const mat = mapearColuna(colaborador, ['MATRICULA', 'ID']) || '-';
+    const cargo = mapearColuna(colaborador, ['CARGO', 'FUNCAO']) || 'ESTAGIÁRIO';
+    const status = colaborador._tipo || (mapearColuna(colaborador, ['STATUS', 'SITUACAO']) || 'ATIVO');
+    const inicio = mapearColuna(colaborador, ['ADMISSAO', 'INICIO']) || '-';
+    const termino = mapearColuna(colaborador, ['TERMINO', 'FIM', 'CONTRATO']) || '-';
+
+    // Preencher Textos
+    document.getElementById('indiv-nome').innerText = nome;
+    document.getElementById('indiv-matricula').innerText = mat;
+    document.getElementById('indiv-cargo').innerText = cargo;
+    document.getElementById('indiv-data-inicio').innerText = inicio;
+    document.getElementById('indiv-data-termino').innerText = termino;
+
+    const badge = document.getElementById('indiv-status-badge');
+    badge.innerText = status;
+    badge.className = `px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${status === 'ATIVO' ? 'bg-brand-accent/10 text-brand-accent' : 'bg-purple-100 text-purple-600'}`;
+
+    // Calcular tempo (simples)
+    if (inicio !== '-' && inicio.includes('-')) {
+        const d1 = new Date(inicio);
+        const d2 = new Date();
+        const meses = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+        document.getElementById('indiv-tempo').innerText = meses + " Meses";
+    } else {
+        document.getElementById('indiv-tempo').innerText = "-";
+    }
+
+    // Filtrar feedbacks deste colaborador
+    const feedbacks = feedbackDB.filter(f =>
+        String(f.colaborador).toUpperCase().includes(nome.toUpperCase()) ||
+        String(f.matricula) === String(mat)
+    );
+
+    const feedLista = document.getElementById('indiv-feedbacks-lista');
+    feedLista.innerHTML = '';
+
+    if (feedbacks.length === 0) {
+        feedLista.innerHTML = '<p class="text-[10px] font-bold text-brand-gray/50 uppercase text-center py-10">Nenhum feedback registrado</p>';
+    } else {
+        feedbacks.forEach(f => {
+            const item = document.createElement('div');
+            item.className = "bg-brand-light p-5 rounded-2xl border border-gray-50 flex flex-col gap-2 text-left";
+            item.innerHTML = `
+                <div class="flex justify-between items-center text-left">
+                    <span class="text-[9px] font-black text-brand-accent uppercase">${f.competencia}</span>
+                    <span class="text-[8px] font-bold text-brand-gray opacity-50">${new Date(f.data).toLocaleDateString()}</span>
+                </div>
+                <p class="text-[10px] font-medium leading-relaxed italic text-brand-gray/80 text-left">"${f.comentario}"</p>
+                <div class="text-[8px] font-black text-brand-primary text-right uppercase">De: ${f.remetente}</div>
+            `;
+            feedLista.appendChild(item);
+        });
+    }
+
+    // Navegar
+    navigateTo('dashboard-individual');
+
+    // Renderizar gráfico fictício de evolução
+    setTimeout(() => renderIndividualChart(feedbacks), 300);
+}
+
+function renderIndividualChart(feedbacks) {
+    const ctx = document.getElementById('chartEvolucaoIndividual');
+    if (!ctx) return;
+
+    if (chartIndividualInstance) chartIndividualInstance.destroy();
+
+    // Dados baseados em feedbacks por mês ou competência (Exemplo iterativo)
+    const labels = ['Integração', 'Mês 2', 'Mês 3', 'Mês 4', 'Mês 5', 'Mês 6'];
+    const data = [60, 65, 75, 72, 85, 92];
+
+    chartIndividualInstance = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Nível de Competência',
+                data: data,
+                borderColor: '#76B82A',
+                backgroundColor: 'rgba(118, 184, 42, 0.1)',
+                borderWidth: 4,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 3
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.02)' }, ticks: { font: { weight: 'black', size: 9 } } },
+                x: { grid: { display: false }, ticks: { font: { weight: 'black', size: 9 } } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
 }

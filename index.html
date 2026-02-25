@@ -129,6 +129,11 @@
                         <i class="ph-bold ph-trend-up text-xl"></i>
                         <span class="font-bold text-xs tracking-wider uppercase">Cases de Sucesso</span>
                     </button>
+                    <button onclick="navigateTo('colaboradores')" id="nav-colaboradores"
+                        class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group admin-only">
+                        <i class="ph-bold ph-users text-xl"></i>
+                        <span class="font-bold text-xs tracking-wider uppercase">Colaboradores</span>
+                    </button>
                     <button onclick="navigateTo('indicadores')" id="nav-indicadores"
                         class="w-full flex items-center gap-5 px-8 py-5 text-brand-gray hover:bg-gray-50 hover:text-brand-primary rounded-[2rem] transition-all group admin-only">
                         <i class="ph-bold ph-chart-bar text-xl"></i>
@@ -461,7 +466,7 @@
                     </div>
                 </div>
 
-                <!-- TELA: LOG DE ATIVIDADES -->
+                <!-- TELA: LOG DE ATIVIDADES (GESTÃO BASE) -->
                 <div id="view-atividades" class="page-section hidden-section page-transition text-left">
                     <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[700px]">
                         <div class="flex justify-between items-center mb-14">
@@ -499,6 +504,104 @@
                                 </thead>
                                 <tbody id="tabela-atividades-body" class="divide-y divide-gray-50/50"></tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: LISTA DE COLABORADORES (GERAL) -->
+                <div id="view-colaboradores" class="page-section hidden-section page-transition text-left">
+                    <div class="grid grid-cols-1 gap-8">
+                        <!-- Lista de Estagiários -->
+                        <div class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 min-h-[500px]">
+                            <div class="flex justify-between items-center mb-14">
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="text-3xl font-black text-brand-primary tracking-tight uppercase">Base
+                                        Completa</h3>
+                                    <p class="text-[10px] font-black text-brand-gray tracking-[0.2em] uppercase">Ativos
+                                        e Promovidos</p>
+                                </div>
+                                <div class="flex gap-4">
+                                    <input type="text" id="buscaColaboradoresGeral"
+                                        placeholder="Filtrar por nome ou matrícula..."
+                                        class="bg-brand-light p-4 rounded-[1.5rem] border border-gray-100 text-[11px] font-black w-96 uppercase shadow-inner shadow-black/5 outline-none focus:border-brand-accent/30 transition-all">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                id="lista-colaboradores-grid">
+                                <!-- Preenchido via app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELA: DASHBOARD DO EMPREGADO (INDIVIDUAL) -->
+                <div id="view-dashboard-individual" class="page-section hidden-section page-transition text-left">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Header do Perfil -->
+                        <div
+                            class="lg:col-span-3 bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-10">
+                            <div
+                                class="w-40 h-40 bg-brand-light rounded-[3rem] flex items-center justify-center border-4 border-white shadow-xl">
+                                <i class="ph-fill ph-user text-7xl text-brand-primary opacity-20"></i>
+                            </div>
+                            <div class="flex-1 text-center md:text-left">
+                                <div class="flex items-center gap-4 justify-center md:justify-start mb-2">
+                                    <span id="indiv-status-badge"
+                                        class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">ATIVO</span>
+                                    <span
+                                        class="text-brand-gray text-[10px] font-black tracking-widest uppercase">Matrícula:
+                                        <span id="indiv-matricula" class="text-brand-primary">3009000</span></span>
+                                </div>
+                                <h1 id="indiv-nome"
+                                    class="text-4xl font-black text-brand-primary uppercase tracking-tight mb-2 italic">
+                                    NOME DO COLABORADOR</h1>
+                                <p id="indiv-cargo"
+                                    class="text-brand-accent text-xs font-black tracking-[0.3em] uppercase">Estagiário
+                                    de Dados</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <button onclick="navigateTo('colaboradores')"
+                                    class="bg-brand-light text-brand-primary p-5 rounded-2xl hover:bg-brand-primary hover:text-white transition-all">
+                                    <i class="ph-bold ph-arrow-left text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cards de Métricas Individuais -->
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Início</p>
+                            <h4 id="indiv-data-inicio" class="text-2xl font-black text-brand-primary">20/08/2025</h4>
+                        </div>
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Término
+                                Contrato</p>
+                            <h4 id="indiv-data-termino" class="text-2xl font-black text-brand-primary">20/08/2026</h4>
+                        </div>
+                        <div class="glass-card p-10 rounded-[3rem] relative overflow-hidden group">
+                            <p class="text-[10px] font-black text-brand-gray tracking-[0.3em] mb-4 uppercase">Tempo de
+                                Casa</p>
+                            <h4 id="indiv-tempo" class="text-2xl font-black text-brand-primary">6 Meses</h4>
+                        </div>
+
+                        <!-- Timeline/Progresso -->
+                        <div
+                            class="lg:col-span-2 bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 h-[500px]">
+                            <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase mb-10">Evolução
+                                do Estagiário</h3>
+                            <div class="flex-1 relative h-[350px]">
+                                <canvas id="chartEvolucaoIndividual"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Feedbacks Recentes -->
+                        <div
+                            class="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100 h-[500px] overflow-hidden flex flex-col">
+                            <h3 class="font-black text-brand-primary text-xs tracking-[0.2em] uppercase mb-10">Feedbacks
+                                Recentes</h3>
+                            <div id="indiv-feedbacks-lista" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                                <!-- Feedbacks listados aqui -->
+                            </div>
                         </div>
                     </div>
                 </div>
