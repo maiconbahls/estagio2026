@@ -6,7 +6,7 @@ const CONFIG = {
     ROLE_KEY: 'cocal_user_role',
     USER_NAME_KEY: 'cocal_user_name',
     DATE_DISPLAY_ID: 'current-date-display',
-    API_URL: 'https://script.google.com/macros/s/AKfycbwEg3cfeU3SW6VNn5mKC9bwHMjRnUnYdJEFnaPdA3t5Ph_J-vABjPWDOJJRvkNWDoBY/exec',
+    API_URL: 'https://script.google.com/macros/s/AKfycbzUIWnA3NrbkLAJ6oWuBrOZG-z13ngheh306dbpc7A2S3Xhxi2oDjW_Je4hXTav5INP/exec',
     CREDENTIALS: { user: 'gestao', pass: 'Cocal@2025' }
 };
 
