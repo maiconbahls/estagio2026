@@ -45,8 +45,9 @@ let chartStatusInstance = null;
 let db = INITIAL_DATA.ativos; // Base de ativos padrão
 
 // INICIALIZAÇÃO
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initClock();
+    await carregarDadosExternos();
     carregarPersistencia();
 
     // Listeners para Upload e Filtro
@@ -56,6 +57,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const buscaEl = document.getElementById('buscaAtividades');
     if (buscaEl) buscaEl.addEventListener('input', (e) => filtrarTabela(e.target.value));
 });
+
+async function carregarDadosExternos() {
+    try {
+        const response = await fetch('base_data.json');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.ativos) INITIAL_DATA.ativos = data.ativos;
+            if (data.promovidos) INITIAL_DATA.promovidos = data.promovidos;
+            console.log("Dados externos carregados com sucesso!");
+        }
+    } catch (e) {
+        console.warn("Aviso: base_data.json não encontrado ou inacessível (comum em acesso via file://). Usando dados internos.");
+    }
+}
 
 function initClock() {
     const el = document.getElementById(CONFIG.DATE_DISPLAY_ID);
@@ -201,6 +216,11 @@ function renderizarPromovidos() {
     tbody.innerHTML = '';
 
     INITIAL_DATA.promovidos.forEach(p => {
+        const colaborador = mapearColuna(p, ['COLABORADOR', 'NOME']) || 'NOME';
+        const cargo = mapearColuna(p, ['CARGO', 'FUNCAO', 'PROMOVIDO']) || 'JOVEM PROFISSIONAL';
+        const dataPromocao = String(mapearColuna(p, ['DATA', 'PROMOCAO']) || '').split(' ')[0] || '-';
+        const matricula = mapearColuna(p, ['MATRICULA', 'ID']) || '-';
+
         // Cards de destaque
         const card = document.createElement('div');
         card.className = "glass-card p-8 rounded-[2.5rem] flex flex-col items-center text-center gap-4 relative overflow-hidden group";
@@ -210,11 +230,11 @@ function renderizarPromovidos() {
                 <i class="ph-fill ph-rocket-launch"></i>
             </div>
             <div>
-                <h4 class="font-black text-brand-primary text-sm uppercase">${p.COLABORADOR}</h4>
-                <p class="text-[9px] font-bold text-brand-accent tracking-widest uppercase">Promovido a ${p.CARGO}</p>
+                <h4 class="font-black text-brand-primary text-sm uppercase">${colaborador}</h4>
+                <p class="text-[9px] font-bold text-brand-accent tracking-widest uppercase">Promovido a ${cargo}</p>
             </div>
             <div class="text-[9px] font-black text-brand-gray bg-brand-light px-4 py-2 rounded-full border border-gray-100 uppercase">
-                Desde ${p.DATA_PROMOCAO}
+                Desde ${dataPromocao}
             </div>
         `;
         container.appendChild(card);
@@ -223,10 +243,10 @@ function renderizarPromovidos() {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-brand-light transition-all border-b border-gray-50 uppercase";
         tr.innerHTML = `
-            <td class="py-6 pl-6 font-mono text-[9px] font-black text-brand-primary opacity-60">${p.MATRICULA}</td>
-            <td class="py-6 font-black text-[11px] text-brand-dark">${p.COLABORADOR}</td>
-            <td class="py-6 text-[10px] font-bold text-brand-accent">${p.CARGO}</td>
-            <td class="py-6 text-right pr-6 font-black text-[10px] text-brand-gray">${p.DATA_PROMOCAO}</td>
+            <td class="py-6 pl-6 font-mono text-[9px] font-black text-brand-primary opacity-60">${matricula}</td>
+            <td class="py-6 font-black text-[11px] text-brand-dark">${colaborador}</td>
+            <td class="py-6 text-[10px] font-bold text-brand-accent">${cargo}</td>
+            <td class="py-6 text-right pr-6 font-black text-[10px] text-brand-gray">${dataPromocao}</td>
         `;
         tbody.appendChild(tr);
     });
