@@ -4,7 +4,7 @@ const CONFIG = {
     STORAGE_KEY: 'cocal_metrics_2026',
     AUTH_KEY: 'cocal_auth_session',
     DATE_DISPLAY_ID: 'current-date-display',
-    CREDENTIALS: { user: 'gestao', pass: 'cocal@2025' }
+    CREDENTIALS: { user: 'gestao', pass: 'Cocal@2025' }
 };
 
 // DADOS REAIS EXTRAÍDOS DA BASE (Mapeamento Inicial)
